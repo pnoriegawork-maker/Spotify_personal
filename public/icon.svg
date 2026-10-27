@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1ed760" />
+      <stop offset="100%" stop-color="#121212" />
+    </linearGradient>
+    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1DB954" />
+      <stop offset="50%" stop-color="#1ed760" />
+      <stop offset="100%" stop-color="#10843a" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="#121212" />
+  <circle cx="256" cy="256" r="230" fill="none" stroke="#1DB954" stroke-width="8" opacity="0.3" />
+  <circle cx="256" cy="256" r="200" fill="#181818" />
+  <!-- Dynamic sound wave & Spotify-inspired curves -->
+  <g fill="none" stroke="#1DB954" stroke-linecap="round">
+    <path d="M 130 190 Q 256 140 382 190" stroke-width="28" />
+    <path d="M 155 256 Q 256 215 357 256" stroke-width="24" />
+    <path d="M 180 320 Q 256 290 332 320" stroke-width="20" />
+  </g>
+  <!-- Cybernetic REA dot indicating reverse-engineering -->
+  <circle cx="395" cy="140" r="14" fill="#00f3ff" />
+</svg>

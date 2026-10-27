@@ -1,0 +1,70 @@
+{
+  "name": "spotify-multiplatform-client",
+  "version": "1.0.0",
+  "description": "Cliente Multiplataforma de Audio basado en la Ingeniería Inversa de Spotify (REA Framework & SpClient Deconstruction)",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "desktop": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build:desktop": "vite build && electron-builder",
+    "mobile:init": "cap init",
+    "mobile:add:android": "cap add android",
+    "build:mobile": "vite build && cap sync android",
+    "build:apk": "vite build && cap sync android && cd android && ./gradlew assembleDebug"
+  },
+  "keywords": [
+    "spotify",
+    "reverse-engineering",
+    "rea",
+    "tauri",
+    "electron",
+    "capacitor",
+    "web-audio-api"
+  ],
+  "author": "Reverse Engineering Lead Architect",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/cli": "^6.1.2",
+    "@capacitor/core": "^6.1.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "vite": "^6.0.1",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.spotifycustom.player",
+    "productName": "SpotifyCustomPlayer",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "signAndEditExecutable": false
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.music"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Audio"
+    }
+  }
+}

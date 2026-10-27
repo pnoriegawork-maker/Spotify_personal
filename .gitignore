@@ -1,0 +1,11 @@
+node_modules/
+dist-electron/
+dist/
+.DS_Store
+*.log
+.vscode/
+.idea/
+*.local
+android/.gradle
+android/build
+android/app/build
