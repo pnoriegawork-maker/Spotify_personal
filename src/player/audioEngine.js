@@ -1,10 +1,11 @@
 /**
- * MÓDULO 3: MOTOR DE AUDIO FLOTANTE Y WEB AUDIO API (STREAM ENGINE)
- * Integra HTML5 Audio con cadena de procesamiento de nodos de Web Audio API:
- * MediaElementSource -> BiquadFilter (Equalizer) -> AnalyserNode (FFT) -> GainNode (Volume) -> Destination
+ * MÓDULO 3: MOTOR DE AUDIO FLOTANTE Y REPRODUCCIÓN OFFLINE
+ * Integra Web Audio API con reproducción inteligente desde almacenamiento interno (IndexedDB)
+ * si no hay señal de red o la conexión es inestable.
  */
 
 import { state } from '../core/state.js';
+import { storage } from '../library/storage.js';
 
 export class AudioEngine {
   constructor() {
@@ -22,35 +23,31 @@ export class AudioEngine {
     this.setupMediaListeners();
   }
 
-  // Inicialización de la cadena Web Audio API (requiere interacción de usuario por políticas de navegador)
   initWebAudio() {
     if (this.isWebAudioInitialized) return;
 
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) {
-        console.warn('Web Audio API no soportada en este entorno, operando con HTML5 Audio básico');
-        return;
-      }
+      if (!AudioCtx) return;
 
       this.audioContext = new AudioCtx();
 
-      // 1. Analizador Espectral FFT
+      // Analizador FFT de 64 bandas
       this.analyser = this.audioContext.createAnalyser();
       this.analyser.fftSize = 64;
       this.analyser.smoothingTimeConstant = 0.8;
 
-      // 2. Filtro Biquad para realce de graves (Sub-Bass boost)
+      // Filtro Biquad para realce acústico de frecuencias bajas
       this.filterNode = this.audioContext.createBiquadFilter();
       this.filterNode.type = 'lowshelf';
       this.filterNode.frequency.setValueAtTime(150, this.audioContext.currentTime);
-      this.filterNode.gain.setValueAtTime(3.5, this.audioContext.currentTime); // +3.5dB cálido
+      this.filterNode.gain.setValueAtTime(3.5, this.audioContext.currentTime);
 
-      // 3. Control de Ganancia
+      // Control de Ganancia
       this.gainNode = this.audioContext.createGain();
       this.gainNode.gain.setValueAtTime(state.get('volume'), this.audioContext.currentTime);
 
-      // Conectar elemento de audio
+      // Conexión del grafo de audio
       this.sourceNode = this.audioContext.createMediaElementSource(this.audio);
       this.sourceNode.connect(this.filterNode);
       this.filterNode.connect(this.analyser);
@@ -58,44 +55,42 @@ export class AudioEngine {
       this.gainNode.connect(this.audioContext.destination);
 
       this.isWebAudioInitialized = true;
-      state.addNetworkLog('webaudio://context', 'Audio Pipeline', 200, 'Cadena Web Audio API configurada (FFT 64 bandas + EQ)');
     } catch (err) {
-      console.warn('No se pudo inicializar Web Audio API:', err);
+      console.warn('Error al iniciar Web Audio API:', err);
     }
   }
 
-  // Configuración de listeners del elemento HTML5 Audio
   setupMediaListeners() {
-    this.audio.addEventListener('play', () => {
-      state.set('isPlaying', true);
-    });
-
-    this.audio.addEventListener('pause', () => {
-      state.set('isPlaying', false);
-    });
-
-    this.audio.addEventListener('timeupdate', () => {
-      state.set('currentTime', this.audio.currentTime);
-    });
-
+    this.audio.addEventListener('play', () => state.set('isPlaying', true));
+    this.audio.addEventListener('pause', () => state.set('isPlaying', false));
+    this.audio.addEventListener('timeupdate', () => state.set('currentTime', this.audio.currentTime));
     this.audio.addEventListener('durationchange', () => {
       if (this.audio.duration && !isNaN(this.audio.duration)) {
         state.set('duration', this.audio.duration);
       }
     });
+    this.audio.addEventListener('ended', () => this.handleTrackEnded());
+    this.audio.addEventListener('error', async (e) => {
+      console.warn('Error en buffer de audio:', e);
+      const current = state.get('currentTrack');
+      
+      // Si falló y no estábamos usando el blob offline, intentar recuperar desde IndexedDB
+      if (current && !this.audio.src.startsWith('blob:')) {
+        const offlineUrl = await storage.getAudioUrlForPlayback(current);
+        if (offlineUrl && offlineUrl.startsWith('blob:')) {
+          this.audio.src = offlineUrl;
+          this.audio.load();
+          this.audio.play().catch(() => {});
+          state.addNetworkLog('device://storage', 'Recuperación Offline', 200, `Rescatada "${current.title}" desde memoria interna tras error de red`);
+          return;
+        }
+      }
 
-    this.audio.addEventListener('ended', () => {
-      this.handleTrackEnded();
-    });
-
-    this.audio.addEventListener('error', (e) => {
-      console.warn('Error de carga de audio:', e);
-      state.addNetworkLog(this.audio.src, 'Audio Error', 404, 'Stream inaccesible, saltando a siguiente pista');
-      setTimeout(() => this.nextTrack(), 1000);
+      setTimeout(() => this.nextTrack(), 1200);
     });
   }
 
-  // Reproducir pista especificada o reanudar actual
+  // Reproducir pista (Prioriza memoria interna si está descargada o si no hay internet)
   async play(track = null) {
     this.initWebAudio();
 
@@ -105,31 +100,39 @@ export class AudioEngine {
 
     if (track) {
       state.set('currentTrack', track);
-      this.audio.src = track.audioUrl;
+
+      // OBTENER AUDIO: Verifica si está guardado en la memoria del teléfono
+      const effectiveUrl = await storage.getAudioUrlForPlayback(track);
+
+      this.audio.src = effectiveUrl;
       this.audio.load();
-      state.addNetworkLog(track.audioUrl, 'Audio Stream', 206, `Cargando buffer de ${track.title}`);
+
+      if (effectiveUrl.startsWith('blob:')) {
+        state.addNetworkLog('device://storage', 'Modo Offline', 200, `Reproduciendo "${track.title}" 100% sin conexión a internet`);
+        state.set('isCurrentTrackOffline', true);
+      } else {
+        state.addNetworkLog(effectiveUrl, 'Audio Stream', 206, `Streaming remoto de "${track.title}"`);
+        state.set('isCurrentTrackOffline', false);
+      }
     }
 
     try {
       await this.audio.play();
       state.set('isPlaying', true);
     } catch (err) {
-      console.warn('Reproducción diferida:', err);
+      console.warn('Playback deferred:', err);
     }
   }
 
-  // Pausar
   pause() {
     this.audio.pause();
     state.set('isPlaying', false);
   }
 
-  // Alternar Play / Pause
   togglePlay() {
     if (this.audio.paused) {
       if (!this.audio.src || this.audio.src === '') {
-        const current = state.get('currentTrack');
-        this.play(current);
+        this.play(state.get('currentTrack'));
       } else {
         this.play();
       }
@@ -138,14 +141,12 @@ export class AudioEngine {
     }
   }
 
-  // Desplazar reproducción a un segundo específico
   seekTo(seconds) {
     if (isNaN(seconds) || seconds < 0) return;
     this.audio.currentTime = seconds;
     state.set('currentTime', seconds);
   }
 
-  // Ajustar volumen (0.0 a 1.0)
   setVolume(value) {
     const clamped = Math.max(0, Math.min(1, value));
     this.audio.volume = clamped;
@@ -156,30 +157,23 @@ export class AudioEngine {
     state.set('isMuted', clamped === 0);
   }
 
-  // Alternar silencio
   toggleMute() {
     const isMuted = state.get('isMuted');
     if (isMuted) {
       this.setVolume(state.get('volume') || 0.8);
-      state.set('isMuted', false);
     } else {
       this.audio.volume = 0;
-      if (this.gainNode) {
-        this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-      }
+      if (this.gainNode) this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
       state.set('isMuted', true);
     }
   }
 
-  // Pista siguiente
   nextTrack() {
     const queue = state.get('queue');
     if (!queue || queue.length === 0) return;
 
     let index = state.get('queueIndex');
-    const isShuffle = state.get('isShuffle');
-
-    if (isShuffle) {
+    if (state.get('isShuffle')) {
       index = Math.floor(Math.random() * queue.length);
     } else {
       index = (index + 1) % queue.length;
@@ -189,14 +183,11 @@ export class AudioEngine {
     this.play(queue[index]);
   }
 
-  // Pista anterior
   prevTrack() {
-    // Si ya lleva más de 3 segundos, reiniciar la pista actual
     if (this.audio.currentTime > 3) {
       this.seekTo(0);
       return;
     }
-
     const queue = state.get('queue');
     if (!queue || queue.length === 0) return;
 
@@ -207,46 +198,34 @@ export class AudioEngine {
     this.play(queue[index]);
   }
 
-  // Gestión de finalización de pista según modo de repetición
   handleTrackEnded() {
     const repeatMode = state.get('repeatMode');
-
     if (repeatMode === 'one') {
       this.seekTo(0);
       this.play();
     } else if (repeatMode === 'all') {
       this.nextTrack();
     } else {
-      // 'none'
       const index = state.get('queueIndex');
       const queue = state.get('queue');
-      if (index < queue.length - 1) {
-        this.nextTrack();
-      } else {
+      if (index < queue.length - 1) this.nextTrack();
+      else {
         this.pause();
         this.seekTo(0);
       }
     }
   }
 
-  // Alternar modo aleatorio (Shuffle)
   toggleShuffle() {
-    const nextState = !state.get('isShuffle');
-    state.set('isShuffle', nextState);
+    state.set('isShuffle', !state.get('isShuffle'));
   }
 
-  // Alternar repetición (none -> all -> one -> none)
   cycleRepeatMode() {
     const current = state.get('repeatMode');
-    let nextMode = 'all';
-    if (current === 'all') nextMode = 'one';
-    else if (current === 'one') nextMode = 'none';
-    else nextMode = 'all';
-
+    const nextMode = current === 'all' ? 'one' : current === 'one' ? 'none' : 'all';
     state.set('repeatMode', nextMode);
   }
 
-  // Obtener datos de frecuencia FFT para el visualizador
   getFrequencyData() {
     if (!this.analyser) return new Uint8Array(32);
     const dataArray = new Uint8Array(this.analyser.frequencyBinCount);

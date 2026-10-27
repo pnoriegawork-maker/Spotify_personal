@@ -42,10 +42,43 @@ class Application {
     // 5. Cargar lista de reproducción lateral
     this.renderSidebarPlaylists();
 
-    // 6. Registrar Service Worker para PWA
+    // 6. Monitoreo de Red (Detección Offline en Smartphone / Modo Avión)
+    this.setupNetworkListeners();
+
+    // 7. Registrar Service Worker para PWA
     this.registerServiceWorker();
 
     showToast('Bienvenido a Spotify Custom Player (REA Core)', 'success');
+  }
+
+  // Monitoreo de conectividad (Modo Online vs Modo Offline para Smartphones)
+  setupNetworkListeners() {
+    const statusDot = document.getElementById('network-status');
+    const offlineBanner = document.getElementById('offline-banner');
+
+    const updateNetwork = () => {
+      const isOnline = navigator.onLine;
+      if (statusDot) {
+        statusDot.className = `status-indicator ${isOnline ? 'online' : 'offline'}`;
+        const text = statusDot.querySelector('.status-text');
+        if (text) text.textContent = isOnline ? 'SpClient Live' : 'Modo Offline (Sin Red)';
+      }
+      if (offlineBanner) {
+        offlineBanner.style.display = isOnline ? 'none' : 'flex';
+      }
+    };
+
+    window.addEventListener('online', () => {
+      updateNetwork();
+      showToast('🟢 Conexión a internet restablecida', 'success');
+    });
+
+    window.addEventListener('offline', () => {
+      updateNetwork();
+      showToast('📡 Sin conexión a internet. Reproduciendo tus canciones favoritas guardadas en el smartphone 🎧', 'warning', 5000);
+    });
+
+    updateNetwork();
   }
 
   // Registro de PWA Service Worker
@@ -182,13 +215,31 @@ class Application {
     if (btnShuffle) btnShuffle.addEventListener('click', () => audioEngine.toggleShuffle());
     if (btnRepeat) btnRepeat.addEventListener('click', () => audioEngine.cycleRepeatMode());
 
-    // Favoritos
+    // Favoritos (Descarga y Almacenamiento Offline en Memoria Física del Móvil)
     if (btnFav) {
-      btnFav.addEventListener('click', () => {
+      btnFav.addEventListener('click', async () => {
         const track = state.get('currentTrack');
-        const isNowFav = storage.toggleFavorite(track);
+        if (!track) return;
+        const willBeFav = !storage.isFavorite(track.id);
+
+        showToast(
+          willBeFav
+            ? `⬇️ Descargando "${track.title}" a la memoria interna...`
+            : `"${track.title}" eliminada de favoritos`,
+          'info'
+        );
+
+        const res = await storage.toggleFavorite(track);
+        const isNowFav = res.isFav;
         this.updateFavoriteUI(isNowFav);
-        showToast(isNowFav ? 'Añadido a tus Me Gusta' : 'Eliminado de tus Me Gusta', 'info');
+
+        if (isNowFav) {
+          showToast(`✅ "${track.title}" guardada. ¡Lista para escuchar sin conexión o en modo avión! 🎧`, 'success', 4000);
+        }
+
+        if (state.get('activeView') === 'library') {
+          viewRenderer.renderLibrary();
+        }
       });
     }
 
@@ -253,10 +304,29 @@ class Application {
     if (mobileBtnNext) mobileBtnNext.addEventListener('click', () => audioEngine.nextTrack());
     if (mobileBtnPrev) mobileBtnPrev.addEventListener('click', () => audioEngine.prevTrack());
     if (mobileBtnFav) {
-      mobileBtnFav.addEventListener('click', () => {
+      mobileBtnFav.addEventListener('click', async () => {
         const track = state.get('currentTrack');
-        const isNowFav = storage.toggleFavorite(track);
+        if (!track) return;
+        const willBeFav = !storage.isFavorite(track.id);
+
+        showToast(
+          willBeFav
+            ? `⬇️ Descargando "${track.title}" al smartphone...`
+            : `"${track.title}" eliminada de favoritos`,
+          'info'
+        );
+
+        const res = await storage.toggleFavorite(track);
+        const isNowFav = res.isFav;
         this.updateFavoriteUI(isNowFav);
+
+        if (isNowFav) {
+          showToast(`✅ "${track.title}" disponible 100% sin internet 🎧`, 'success', 4000);
+        }
+
+        if (state.get('activeView') === 'library') {
+          viewRenderer.renderLibrary();
+        }
       });
     }
     if (mobileSeek) {

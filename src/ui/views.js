@@ -138,12 +138,28 @@ export class ViewRenderer {
         <span class="sub-heading">${favorites.length} PISTAS GUARDADAS</span>
       </div>
 
+      <div class="offline-storage-card">
+        <div class="storage-card-icon">💾</div>
+        <div class="storage-card-info">
+          <div class="storage-card-title">Almacenamiento Local Físico (Modo Sin Conexión)</div>
+          <div class="storage-card-desc">
+            ${favorites.length > 0 
+              ? `Tienes <strong>${favorites.length} canciones descargadas</strong> directamente en la memoria interna de tu dispositivo. Puedes escucharlas sin internet, en modo avión o con señal baja sin cortes.`
+              : 'Marca cualquier canción con el icono de corazón (❤️) para descargarla automáticamente en tu teléfono y escucharla sin conexión.'}
+          </div>
+        </div>
+        <div class="storage-badge-status ${favorites.length > 0 ? 'active' : ''}">
+          ${favorites.length > 0 ? '🟢 100% Offline Listo' : '⚪ Sin Descargas'}
+        </div>
+      </div>
+
       ${
         favorites.length === 0
           ? `
         <div style="padding: 40px 0; text-align: center; color: var(--color-text-sub);">
           <svg style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--color-text-muted);" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-          <p>Aún no tienes canciones favoritas. Haz clic en el icono de corazón en cualquier pista para añadirla aquí.</p>
+          <p style="font-weight: 600; color: #fff; margin-bottom: 6px;">Aún no tienes canciones guardadas sin conexión</p>
+          <p style="font-size: 13px;">Toca el icono ❤️ en cualquier canción para guardarla físicamente en tu móvil y escucharla en cualquier lugar.</p>
         </div>
       `
           : `
@@ -151,7 +167,7 @@ export class ViewRenderer {
           <thead class="tracklist-header">
             <tr>
               <th>#</th>
-              <th>Título</th>
+              <th>Título y Estado</th>
               <th>Álbum</th>
               <th style="text-align: right;">Duración</th>
             </tr>
@@ -167,11 +183,20 @@ export class ViewRenderer {
       favorites.forEach((track, idx) => {
         const isActive = currentTrack && currentTrack.id === track.id;
         tbody.appendChild(
-          createTrackRow(track, idx, isActive, (t) => {
-            state.set('queue', favorites);
-            state.set('queueIndex', idx);
-            audioEngine.play(t);
-          })
+          createTrackRow(
+            track,
+            idx,
+            isActive,
+            (t) => {
+              state.set('queue', favorites);
+              state.set('queueIndex', idx);
+              audioEngine.play(t);
+            },
+            () => {
+              // Re-renderizar si se elimina de la biblioteca
+              this.renderLibrary();
+            }
+          )
         );
       });
     }

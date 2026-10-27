@@ -1277,6 +1277,171 @@ button {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ==========================================================================
+   ESTILOS DE MODO OFFLINE, ALMACENAMIENTO INDEXEDDB Y BADGES
+   ========================================================================== */
+.offline-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(90deg, #92400e, #b45309);
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+.offline-banner .offline-icon {
+  font-size: 20px;
+}
+.status-indicator.offline {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+.status-indicator.offline .status-dot {
+  background-color: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
+
+.offline-storage-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.12) 0%, rgba(24, 24, 24, 0.95) 100%);
+  border: 1px solid rgba(29, 185, 84, 0.35);
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  margin-bottom: 24px;
+}
+.storage-card-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+.storage-card-info {
+  flex: 1;
+}
+.storage-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+.storage-card-desc {
+  font-size: 13px;
+  color: var(--color-text-sub);
+  line-height: 1.4;
+}
+.storage-badge-status {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-sub);
+  white-space: nowrap;
+}
+.storage-badge-status.active {
+  background: rgba(29, 185, 84, 0.2);
+  color: var(--color-green);
+  border: 1px solid rgba(29, 185, 84, 0.4);
+}
+
+.card-fav-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  border: none;
+  color: #b3b3b3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  z-index: 5;
+}
+.card-fav-btn:hover {
+  transform: scale(1.1);
+  color: #ffffff;
+}
+.card-fav-btn.active {
+  color: var(--color-green);
+  background: rgba(0, 0, 0, 0.85);
+}
+.card-fav-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.card-subtitle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 2px;
+}
+.badge-offline-mini {
+  font-size: 10px;
+  background: rgba(29, 185, 84, 0.15);
+  color: var(--color-green);
+  border: 1px solid rgba(29, 185, 84, 0.3);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.track-row-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.badge-offline-tag {
+  font-size: 10px;
+  background: rgba(29, 185, 84, 0.2);
+  color: var(--color-green);
+  border: 1px solid rgba(29, 185, 84, 0.35);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.track-row-time-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.row-fav-btn {
+  background: none;
+  border: none;
+  color: #727272;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: all var(--transition-fast);
+}
+.row-fav-btn:hover {
+  color: #ffffff;
+  transform: scale(1.15);
+}
+.row-fav-btn.active {
+  color: var(--color-green);
+}
+.row-fav-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* NAVEGACIÓN MÓVIL POR DEFECTO OCULTA EN DESKTOP */
 .mobile-bottom-nav {
   display: none;
@@ -1301,6 +1466,11 @@ button {
   }
   .status-indicator {
     display: none;
+  }
+  .status-indicator.offline {
+    display: flex;
+    font-size: 10px;
+    padding: 4px 8px;
   }
   .content-view {
     padding: 16px 16px 24px 16px;
