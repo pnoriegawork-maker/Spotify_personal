@@ -12,11 +12,26 @@ export default defineConfig({
   server: {
     port: 5173,
     host: '0.0.0.0',
-    allowedHosts: true
+    allowedHosts: true,
+    proxy: {
+      '/api/saavn': {
+        target: 'https://www.jiosaavn.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/saavn/, '')
+      }
+    }
   },
   preview: {
     port: 5173,
     host: '0.0.0.0',
-    allowedHosts: true
+    allowedHosts: true,
+    proxy: {
+      '/api/saavn': {
+        target: 'https://www.jiosaavn.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/saavn/, '')
+      }
+    }
   }
 });
+

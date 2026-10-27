@@ -29,7 +29,8 @@
   "dependencies": {
     "@capacitor/android": "^6.1.2",
     "@capacitor/cli": "^6.1.2",
-    "@capacitor/core": "^6.1.2"
+    "@capacitor/core": "^6.1.2",
+    "crypto-js": "^4.2.0"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

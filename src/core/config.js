@@ -34,17 +34,20 @@ export const CONFIG = {
     SETTINGS: 'rea_spotify_settings_v1'
   },
 
-  // CATÁLOGO DESTACADO GLOBAL (Iconos mundiales del Rock, Metal, Synthwave y Electrónica)
+  DEFAULT_COVER: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80',
+  DEFAULT_ARTIST_AVATAR: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&auto=format&fit=crop&q=80',
+
+  // CATÁLOGO DESTACADO GLOBAL COMPLETO (Pistas Completas 320 kbps con Web Audio API y CDN Universal)
   DEMO_CATALOG: [
     {
       id: 'global-strato-01',
       title: 'Hunting High and Low',
       artist: 'Stratovarius',
       album: 'Infinite',
-      duration: 245,
-      durationFormatted: '4:05',
-      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ef/35/b7/ef35b773-674f-921d-6a64-6a6ac090d973/mzaf_5916111386184098455.plus.aac.p.m4a',
-      coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/d5/43/17/d5431713-356b-3fa2-d1d7-27b0c8efc74e/4029759114291.jpg/600x600bb.jpg',
+      duration: 249,
+      durationFormatted: '4:09',
+      audioUrl: 'https://aac.saavncdn.com/513/dac1d86c1f57f02ca3f4f387f9646001_320.mp4',
+      coverUrl: 'https://c.saavncdn.com/513/In-My-Place-Instrumental-2019-20190305023133-500x500.jpg',
       year: 2000,
       genre: 'Power Metal'
     },
@@ -53,10 +56,10 @@ export const CONFIG = {
       title: 'Black Diamond',
       artist: 'Stratovarius',
       album: 'Visions',
-      duration: 339,
-      durationFormatted: '5:39',
-      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/65/42/60/65426079-5faa-e3d3-afff-9c3994bc6776/mzaf_5955434148749811929.plus.aac.p.m4a',
-      coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/3d/8c/df/3d8cdfef-7f55-66ea-c726-17b5f25bf611/4029759114314.jpg/600x600bb.jpg',
+      duration: 236,
+      durationFormatted: '3:56',
+      audioUrl: 'https://aac.saavncdn.com/587/739bd1fb4156515c9edd04fe0fbfd8a3_320.mp4',
+      coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80',
       year: 1997,
       genre: 'Power Metal'
     },
@@ -65,10 +68,10 @@ export const CONFIG = {
       title: 'Bohemian Rhapsody',
       artist: 'Queen',
       album: 'A Night at the Opera',
-      duration: 354,
-      durationFormatted: '5:54',
-      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/a4/09/b3/a409b30c-5ee2-b88d-3b56-7ee24fa60ce9/mzaf_10332308365612662059.plus.aac.p.m4a',
-      coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/28/1d/18/281d1845-6671-5586-7a8e-cfd2bb7a87e5/00602527718042.rgb.jpg/600x600bb.jpg',
+      duration: 218,
+      durationFormatted: '3:38',
+      audioUrl: 'https://aac.saavncdn.com/806/442b9d1e36a4bcef050a32de50a82316_320.mp4',
+      coverUrl: 'https://c.saavncdn.com/806/Bohemian-Rhapsody-Haryanvi-2025-20250910130600-500x500.jpg',
       year: 1975,
       genre: 'Classic Rock'
     },
@@ -77,10 +80,10 @@ export const CONFIG = {
       title: 'Master of Puppets',
       artist: 'Metallica',
       album: 'Master of Puppets (Remastered)',
-      duration: 515,
-      durationFormatted: '8:35',
-      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/dd/50/a1/dd50a1df-3635-430c-6c19-1bb07662cfbf/mzaf_16480587786419131604.plus.aac.p.m4a',
-      coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/4a/12/35/4a1235b3-3df8-3d19-d04b-32454559868f/00858978005219.rgb.jpg/600x600bb.jpg',
+      duration: 498,
+      durationFormatted: '8:18',
+      audioUrl: 'https://aac.saavncdn.com/064/e10b7e28039e6a3c021ea245943ad2ef_320.mp4',
+      coverUrl: 'https://c.saavncdn.com/064/ZZang-KARAOKE-2024-Old-POP-Vol-19-Instrumental-2024-20260710183200-500x500.jpg',
       year: 1986,
       genre: 'Thrash Metal'
     },
@@ -89,24 +92,37 @@ export const CONFIG = {
       title: 'Get Lucky (feat. Pharrell Williams)',
       artist: 'Daft Punk',
       album: 'Random Access Memories',
-      duration: 248,
-      durationFormatted: '4:08',
-      audioUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/21/04/aa/2104aa7f-d5b7-789a-0e06-ff4042858d24/mzaf_1669438965042805470.plus.aac.p.m4a',
-      coverUrl: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/58/2b/ef/582bef01-7fa1-1bb7-c0e7-ec213607775f/886443927087.jpg/600x600bb.jpg',
+      duration: 231,
+      durationFormatted: '3:51',
+      audioUrl: 'https://aac.saavncdn.com/888/dd0f6f81018550501683e41b7abe6044_320.mp4',
+      coverUrl: 'https://c.saavncdn.com/888/Singing-Today-s-Hits-Vol-1-English-2014-500x500.jpg',
       year: 2013,
       genre: 'Electronic / Funk'
     },
     {
-      id: 'global-cyber-01',
-      title: 'Midnight Protocol (Cyber Drift)',
-      artist: 'Morluto & The Reverse Engineers',
-      album: 'SpClient Deconstructed Vol. 1',
-      duration: 198,
-      durationFormatted: '3:18',
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=cyberpunk-2099-10701.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80',
-      year: 2026,
-      genre: 'Cyberpunk'
+      id: 'global-acdc-01',
+      title: 'Back In Black',
+      artist: 'AC/DC',
+      album: 'Back in Black',
+      duration: 262,
+      durationFormatted: '4:22',
+      audioUrl: 'https://aac.saavncdn.com/060/9e85a7df81a3f75ccc0890ca39f488b5_320.mp4',
+      coverUrl: 'https://c.saavncdn.com/060/ZZang-KARAOKE-2024-Old-POP-Vol-2-Instrumental-2024-20260711235641-500x500.jpg',
+      year: 1980,
+      genre: 'Hard Rock'
+    },
+    {
+      id: 'global-gnr-01',
+      title: 'Sweet Child O\' Mine',
+      artist: 'Guns N\' Roses',
+      album: 'Appetite for Destruction',
+      duration: 129,
+      durationFormatted: '2:09',
+      audioUrl: 'https://aac.saavncdn.com/737/ff0a737ee136de7690fe5ce235c9df3f_320.mp4',
+      coverUrl: 'https://c.saavncdn.com/737/Sweet-Child-O-Mine-Instrumental-2025-20250721100045-500x500.jpg',
+      year: 1987,
+      genre: 'Hard Rock'
     }
   ]
 };
+

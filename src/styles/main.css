@@ -1559,3 +1559,166 @@ button {
     height: 22px;
   }
 }
+
+/* ==========================================================================
+   VÍNCULOS INTERACTIVOS (ARTISTAS, ÁLBUMES, SELECTORES)
+   ========================================================================== */
+.clickable-artist {
+  cursor: pointer !important;
+  transition: color var(--transition-fast), text-decoration var(--transition-fast);
+}
+.clickable-artist:hover {
+  color: var(--color-green) !important;
+  text-decoration: underline;
+}
+
+.clickable-album {
+  cursor: pointer !important;
+  transition: color var(--transition-fast), text-decoration var(--transition-fast);
+}
+.clickable-album:hover {
+  color: #ffffff !important;
+  text-decoration: underline;
+}
+
+/* TARJETAS DE ARTISTAS */
+.artist-card .artist-avatar-wrapper {
+  border-radius: 50% !important;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+.artist-card .artist-thumb-img {
+  border-radius: 50% !important;
+  object-fit: cover;
+}
+.artist-card-title {
+  text-align: center;
+}
+.artist-card .card-subtitle-row {
+  justify-content: center;
+}
+.artist-badge-pill {
+  color: var(--color-text-sub);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* VISTA DETALLE DE ARTISTA Y ÁLBUM */
+.detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.3s ease;
+}
+
+.btn-back-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: fit-content;
+}
+.btn-back-view:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+  transform: translateX(-3px);
+}
+.btn-back-view svg {
+  width: 16px;
+  height: 16px;
+}
+
+.artist-hero-banner {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 32px;
+  background: linear-gradient(135deg, rgba(29, 185, 84, 0.22) 0%, rgba(18, 18, 18, 0.95) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+.artist-hero-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  border: 3px solid rgba(255, 255, 255, 0.12);
+}
+
+.album-hero-banner {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 32px;
+  background: linear-gradient(135deg, rgba(80, 80, 80, 0.25) 0%, rgba(18, 18, 18, 0.95) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+.album-hero-cover {
+  width: 160px;
+  height: 160px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.artist-hero-meta,
+.album-hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.artist-hero-name,
+.album-hero-title {
+  font-size: 34px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.artist-hero-genre,
+.album-hero-artist {
+  color: var(--color-text-sub);
+  font-size: 14px;
+}
+
+.detail-actions {
+  margin-top: 10px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-green);
+  color: #000000;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+.btn-primary:hover {
+  transform: scale(1.04);
+  background-color: #1ed760;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
