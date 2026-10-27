@@ -81,11 +81,33 @@ cd android
 El archivo se encontrará en:
 `android/app/build/outputs/apk/debug/app-debug.apk`
 
-#### Opción B: Instalación Directa PWA (Android / iOS / ChromeOS)
-1. Despliega la carpeta `dist/` en cualquier hosting HTTPS (Vercel, GitHub Pages, Netlify o servidor local).
-2. Abre la URL en el navegador del Smartphone (Chrome en Android, Safari en iOS).
-3. Presiona **"Añadir a la pantalla de inicio"** o **"Instalar aplicación"**.
-4. ¡Listo! La app se ejecutará a pantalla completa como una app nativa con soporte sin conexión.
+#### Opción B: Instalación Directa PWA (Android / iOS / ChromeOS) — ¡Ya Desplegada y Activa!
+- **URL Oficial en Producción**:  
+  👉 **[https://pnoriegawork-maker.github.io/Spotify_personal/](https://pnoriegawork-maker.github.io/Spotify_personal/)**
+- **Repositorio Oficial en GitHub**:  
+  👉 **[https://github.com/pnoriegawork-maker/Spotify_personal](https://github.com/pnoriegawork-maker/Spotify_personal)**
+
+1. Abre la URL en el navegador de tu smartphone (Chrome, Safari, Brave o Edge).
+2. Toca el menú (tres puntos) y presiona **"Agregar a la pantalla principal"** o **"Instalar aplicación"**.
+3. ¡Listo! La app se ejecutará a pantalla completa como una aplicación nativa, con soporte de almacenamiento local y reproducción sin conexión.
+
+---
+
+## 💾 Despliegue de Actualizaciones Futuras en 1 Solo Paso
+
+Cada vez que abras esta carpeta y hagas ajustes en el código, solo ejecuta:
+```bash
+npm run deploy:pages
+```
+Este comando compilará el frontend y actualizará automáticamente la versión de tu smartphone en GitHub Pages.
+
+---
+
+## 🎧 Motor de Reproducción Offline (IndexedDB + Service Worker)
+
+- **Descarga Física**: Cuando marcas una canción con el icono de corazón (❤️), la aplicación descarga el archivo binario de audio (`Blob`) y su carátula a la base de datos `SpotifyOfflineAudioDB` de la memoria interna.
+- **Sin Conexión o Modo Avión**: En `Tu Biblioteca`, las canciones marcadas como favoritas se reproducen directamente desde `URL.createObjectURL(blob)`, garantizando reproducción instantánea con 0% de señal de internet.
+- **Caché de Aplicación**: El Service Worker (`public/sw.js`) garantiza que el shell visual de la aplicación cargue de inmediato incluso si abres el móvil en modo avión.
 
 ---
 
@@ -99,3 +121,4 @@ El archivo se encontrará en:
 | `Flecha Arriba` | Subir volumen (+5%) |
 | `Flecha Abajo` | Bajar volumen (-5%) |
 | `M` | Silenciar / Restaurar volumen |
+

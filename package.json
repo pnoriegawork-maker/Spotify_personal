@@ -12,7 +12,8 @@
     "mobile:init": "cap init",
     "mobile:add:android": "cap add android",
     "build:mobile": "vite build && cap sync android",
-    "build:apk": "vite build && cap sync android && cd android && ./gradlew assembleDebug"
+    "build:apk": "vite build && cap sync android && cd android && ./gradlew assembleDebug",
+    "deploy:pages": "node scripts/deploy.js"
   },
   "keywords": [
     "spotify",
