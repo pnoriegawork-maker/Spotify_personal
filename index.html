@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Spotify Custom Player | Universal Edition</title>
+  <meta name="description" content="Cliente Multiplataforma de Audio basado en la deconstrucción de Spotify (REA Framework, SpClient y Web Audio API)">
+  <meta name="theme-color" content="#121212">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/index-1z4md3Wc.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DpqVzpT7.css">
+</head>
+<body class="spotify-theme">
+  <div id="app" class="app-layout">
+    
+    <!-- BARRA LATERAL (DESKTOP) -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 512 512" class="logo-svg">
+            <path d="M 130 190 Q 256 140 382 190" stroke="#1DB954" stroke-width="36" fill="none" stroke-linecap="round"/>
+            <path d="M 155 256 Q 256 215 357 256" stroke="#1DB954" stroke-width="30" fill="none" stroke-linecap="round"/>
+            <path d="M 180 320 Q 256 290 332 320" stroke="#1DB954" stroke-width="24" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">Spotify</span>
+          <span class="logo-tag">REA CORE</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button id="nav-home" class="nav-item active" data-view="home">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          <span>Inicio</span>
+        </button>
+        <button id="nav-search" class="nav-item" data-view="search">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <span>Buscar</span>
+        </button>
+        <button id="nav-library" class="nav-item" data-view="library">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          <span>Tu Biblioteca</span>
+        </button>
+        <button id="nav-inspector" class="nav-item badge-parent" data-view="inspector">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+          <span>Laboratorio REA</span>
+          <span class="badge-pulse">SpClient</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-library-header">
+        <span class="sub-heading">PLAYLISTS & FAVORITOS</span>
+        <button id="btn-create-playlist" class="btn-icon" title="Crear Playlist">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </button>
+      </div>
+
+      <div id="sidebar-playlists" class="sidebar-playlists-list"></div>
+
+      <div class="sidebar-footer">
+        <button id="btn-open-settings" class="sidebar-setting-btn">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.485.485 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          <span>Configuración & OAuth</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- AREA PRINCIPAL -->
+    <main class="main-container">
+      <header class="topbar">
+        <div class="topbar-controls">
+          <button id="topbar-btn-back" class="circle-btn" title="Atrás">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </button>
+          <button id="topbar-btn-forward" class="circle-btn" title="Adelante">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </button>
+        </div>
+
+        <div id="topbar-search-box" class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" id="global-search-input" placeholder="¿Qué quieres escuchar? (Artistas, canciones, álbumes...)" autocomplete="off">
+          <button id="clear-search-btn" class="clear-btn" style="display: none;">&times;</button>
+        </div>
+
+        <div class="topbar-actions">
+          <div id="network-status" class="status-indicator online" title="Estado de Red: Online">
+            <span class="status-dot"></span>
+            <span class="status-text">SpClient Live</span>
+          </div>
+
+          <button id="btn-auth-profile" class="profile-pill">
+            <div class="profile-avatar">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <span id="profile-name">Modo Libre / SpClient</span>
+          </button>
+        </div>
+      </header>
+
+      <div id="offline-banner" class="offline-banner" style="display: none;">
+        <span class="offline-icon">📡</span>
+        <span class="offline-text"><strong>Modo Sin Conexión Activo:</strong> Tu smartphone no tiene conexión a internet. Reproduciendo tus canciones favoritas desde la memoria interna sin cortes.</span>
+      </div>
+
+      <section id="content-view" class="content-view">
+        <div id="view-home" class="page-view active"></div>
+        <div id="view-search" class="page-view"></div>
+        <div id="view-library" class="page-view"></div>
+        <div id="view-inspector" class="page-view"></div>
+      </section>
+    </main>
+
+    <!-- BARRA DE REPRODUCCION FLOTANTE (STICKY FOOTER) -->
+    <footer id="player-bar" class="player-bar">
+      <div class="player-track-info">
+        <div class="track-cover-wrapper" id="player-cover-container">
+          <img id="player-cover-art" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&auto=format&fit=crop&q=80" alt="Cover" class="track-cover-img">
+          <div class="cover-overlay-btn" id="btn-expand-mobile" title="Expandir Reproductor">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/></svg>
+          </div>
+        </div>
+        <div class="track-metadata">
+          <div class="track-title-marquee">
+            <span id="player-track-name" class="track-name">Hunting High and Low</span>
+          </div>
+          <span id="player-artist-name" class="track-artist">Stratovarius</span>
+        </div>
+        <button id="btn-toggle-favorite" class="btn-icon favorite-btn" title="Añadir a Favoritos">
+          <svg viewBox="0 0 24 24" id="fav-icon-svg"><path fill="currentColor" d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>
+        </button>
+      </div>
+
+      <div class="player-controls-container">
+        <div class="playback-buttons">
+          <button id="btn-shuffle" class="btn-icon" title="Aleatorio">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+          </button>
+          <button id="btn-prev" class="btn-icon" title="Anterior">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+          <button id="btn-play-pause" class="play-main-btn" title="Reproducir">
+            <svg viewBox="0 0 24 24" id="play-pause-icon"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button id="btn-next" class="btn-icon" title="Siguiente">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+          <button id="btn-repeat" class="btn-icon" title="Repetir">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+          </button>
+        </div>
+
+        <div class="progress-bar-container">
+          <span id="time-current" class="time-label">0:00</span>
+          <div id="seek-slider-track" class="slider-track" role="slider" aria-label="Progreso">
+            <div id="seek-progress" class="slider-fill"></div>
+            <div id="seek-thumb" class="slider-thumb"></div>
+          </div>
+          <span id="time-duration" class="time-label">0:00</span>
+        </div>
+      </div>
+
+      <div class="player-tools-container">
+        <div class="visualizer-container" title="Espectro FFT en Vivo (Web Audio API)">
+          <canvas id="visualizer-canvas" width="100" height="32"></canvas>
+        </div>
+
+        <button id="btn-open-lyrics" class="btn-icon" title="Letras">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </button>
+
+        <button id="btn-open-queue" class="btn-icon" title="Cola de reproducción">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/></svg>
+        </button>
+
+        <div class="volume-control-wrapper">
+          <button id="btn-volume-icon" class="btn-icon" title="Silenciar">
+            <svg viewBox="0 0 24 24" id="volume-svg"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          </button>
+          <div id="volume-slider-track" class="slider-track volume-track" role="slider" aria-label="Volumen">
+            <div id="volume-progress" class="slider-fill"></div>
+            <div id="volume-thumb" class="slider-thumb"></div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- BARRA INFERIOR DE NAVEGACION (SMARTPHONES / MOVIL) -->
+    <nav class="mobile-bottom-nav">
+      <button class="mobile-nav-btn active" data-view="home">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="mobile-nav-btn" data-view="search">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <span>Buscar</span>
+      </button>
+      <button class="mobile-nav-btn" data-view="library">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        <span>Biblioteca</span>
+      </button>
+      <button class="mobile-nav-btn" data-view="inspector">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg>
+        <span>REA Lab</span>
+      </button>
+    </nav>
+
+    <!-- MODAL EXPANDIDO DE REPRODUCTOR MOVIL (PANTALLA COMPLETA) -->
+    <div id="mobile-player-modal" class="modal-mobile-player">
+      <div class="modal-header">
+        <button id="btn-close-mobile-player" class="btn-icon">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+        </button>
+        <div class="modal-header-title">
+          <span>REPRODUCIENDO DESDE REA AUDIO</span>
+        </div>
+        <button id="btn-mobile-more" class="btn-icon">
+          <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body-player">
+        <div class="large-cover-wrapper">
+          <img id="mobile-large-cover" src="" alt="Album Cover" class="large-cover-img">
+        </div>
+
+        <div class="mobile-info-row">
+          <div class="mobile-titles">
+            <h2 id="mobile-track-title">Pista de Audio</h2>
+            <p id="mobile-track-artist">Artista</p>
+          </div>
+          <button id="mobile-btn-favorite" class="btn-icon favorite-btn">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3z"/></svg>
+          </button>
+        </div>
+
+        <div class="mobile-progress-wrapper">
+          <div id="mobile-seek-track" class="slider-track mobile-slider">
+            <div id="mobile-seek-fill" class="slider-fill"></div>
+            <div id="mobile-seek-thumb" class="slider-thumb"></div>
+          </div>
+          <div class="mobile-time-row">
+            <span id="mobile-time-current">0:00</span>
+            <span id="mobile-time-duration">0:00</span>
+          </div>
+        </div>
+
+        <div class="mobile-controls-row">
+          <button id="mobile-btn-shuffle" class="btn-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5z"/></svg></button>
+          <button id="mobile-btn-prev" class="btn-icon icon-large"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+          <button id="mobile-btn-play-pause" class="play-main-btn large-play"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></button>
+          <button id="mobile-btn-next" class="btn-icon icon-large"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+          <button id="mobile-btn-repeat" class="btn-icon"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg></button>
+        </div>
+
+        <div class="mobile-lyrics-preview">
+          <div class="lyrics-preview-header">
+            <span>LETRAS EN VIVO</span>
+            <button id="btn-expand-lyrics-mobile" class="pill-mini">Ver Todo</button>
+          </div>
+          <p id="mobile-lyrics-text" class="lyrics-snippet">Cargando liricas sincronizadas de la API...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURACION & OAUTH2 / CREDENCIALES -->
+    <div id="modal-settings" class="modal-backdrop">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Configuración del Motor & OAuth 2.0 PKCE</h3>
+          <button id="btn-close-settings" class="btn-icon">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">
+            Configura tu conexión con Spotify Web API y los endpoints de SpClient analizados con <strong>morluto/rea</strong>.
+          </p>
+
+          <div class="form-group">
+            <label for="input-client-id">Spotify Client ID (OAuth PKCE sin secret expuesto)</label>
+            <input type="text" id="input-client-id" class="input-text" placeholder="Ej: 279eb526b18d420481e7f91e3f61513b">
+            <small class="help-text">Puedes crear un Client ID gratis en developer.spotify.com o utilizar el modo simulador REA.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="select-stream-quality">Calidad del Stream de Audio</label>
+            <select id="select-stream-quality" class="input-select">
+              <option value="96">Normal (Ogg Vorbis / AAC 96 kbps - Móvil Ahorro)</option>
+              <option value="160" selected>Alta (Ogg Vorbis / AAC 160 kbps - Equilibrado)</option>
+              <option value="320">Ultra High Fidelity (Ogg Vorbis 320 kbps - Master)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="select-audio-output">Motor de Salida de Audio</label>
+            <select id="select-audio-output" class="input-select">
+              <option value="webaudio" selected>Web Audio API 60 FPS (Frecuencias FFT en vivo + EQ Biquad)</option>
+              <option value="native">HTML5 Media Element Directo</option>
+            </select>
+          </div>
+
+          <div class="settings-actions">
+            <button id="btn-save-settings" class="btn-primary">Guardar Cambios</button>
+            <button id="btn-reset-cache" class="btn-secondary">Limpiar Caché Local</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-queue" class="modal-drawer">
+      <div class="drawer-header">
+        <h3>Cola de Reproducción</h3>
+        <button id="btn-close-queue" class="btn-icon">&times;</button>
+      </div>
+      <div class="drawer-body" id="queue-list-container"></div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+  </div>
+
+</body>
+</html>
