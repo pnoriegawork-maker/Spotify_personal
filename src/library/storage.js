@@ -56,8 +56,35 @@ export class StorageManager {
     try {
       const raw = localStorage.getItem(CONFIG.STORAGE_KEYS.FAVORITES);
       if (raw) {
-        const favs = JSON.parse(raw);
+        let favs = JSON.parse(raw);
+        // Sincronizar con catálogo maestro oficial si coincide ID o título/artista
+        favs = favs.map((f) => {
+          const official = CONFIG.DEMO_CATALOG.find(
+            (d) =>
+              d.id === f.id ||
+              (d.title.toLowerCase() === (f.title || '').toLowerCase() &&
+                d.artist.toLowerCase() === (f.artist || '').toLowerCase())
+          );
+          if (official) {
+            return {
+              ...f,
+              id: official.id,
+              title: official.title,
+              artist: official.artist,
+              album: official.album,
+              audioUrl: official.audioUrl,
+              coverUrl: official.coverUrl,
+              duration: official.duration,
+              durationFormatted: official.durationFormatted,
+              year: official.year,
+              genre: official.genre,
+              isFullTrack: true
+            };
+          }
+          return f;
+        });
         state.set('favorites', favs);
+        localStorage.setItem(CONFIG.STORAGE_KEYS.FAVORITES, JSON.stringify(favs));
       }
     } catch (e) {
       console.warn('Error leyendo favoritos:', e);
@@ -194,6 +221,13 @@ export class StorageManager {
         req.onsuccess = (e) => {
           const record = e.target.result;
           if (record && record.blob) {
+            // Si la pista se actualizó a la versión oficial de estudio y el blob guardado es anterior, purgar caché
+            if (track.audioUrl && record.audioUrl && record.audioUrl !== track.audioUrl) {
+              this.deleteAudioOffline(track.id);
+              resolve(track.audioUrl);
+              return;
+            }
+
             // Si ya teníamos una URL previa de este track, revocar para liberar RAM
             if (this.activeObjectUrls.has(track.id)) {
               try { URL.revokeObjectURL(this.activeObjectUrls.get(track.id)); } catch (_) {}

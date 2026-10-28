@@ -184,47 +184,90 @@ export class SpotifyApiClient {
     }).filter(t => t.audioUrl && t.audioUrl.startsWith('http'));
   }
 
-  // Fusionar pistas de Saavn y de iTunes garantizando audio completo y carátulas funcionales
+  // Fusionar pistas priorizando las pistas maestras de estudio verificadas y filtrando karaokes
   mergeAndResolveTracks(saavnTracks, itunesTracks, query) {
     const list = [];
     const seenTitles = new Set();
+    const qLower = (query || '').toLowerCase().trim();
 
-    // 1. Primero las pistas con audio 320kbps completo
+    // 1. MÁXIMA PRIORIDAD: Catálogo Maestro Verificado (Estudio Original)
+    CONFIG.DEMO_CATALOG.forEach((demo) => {
+      const match =
+        !qLower ||
+        demo.title.toLowerCase().includes(qLower) ||
+        demo.artist.toLowerCase().includes(qLower) ||
+        demo.album.toLowerCase().includes(qLower);
+
+      if (match) {
+        const key = `${demo.title.toLowerCase().trim()}_${demo.artist.toLowerCase().trim()}`;
+        if (!seenTitles.has(key)) {
+          seenTitles.add(key);
+          list.push(demo);
+        }
+      }
+    });
+
+    // 2. Complementar con Saavn filtrando karaokes y tributos de baja fidelidad
     saavnTracks.forEach((t) => {
-      const key = `${t.title.toLowerCase().trim()}_${t.artist.toLowerCase().trim()}`;
+      const titleLower = t.title.toLowerCase();
+      const artistLower = t.artist.toLowerCase();
+
+      // Descartar versiones no oficiales, karaoke, instrumentales genéricos y covers erróneos
+      if (
+        titleLower.includes('karaoke') ||
+        titleLower.includes('zzang') ||
+        titleLower.includes('instrumental') ||
+        titleLower.includes('tribute') ||
+        artistLower.includes('karaoke') ||
+        artistLower.includes('zzang')
+      ) {
+        return;
+      }
+
+      // Si coincide con alguna pista maestra oficial, usar la pista maestra oficial
+      const officialMatch = CONFIG.DEMO_CATALOG.find((d) =>
+        (d.title.toLowerCase() === titleLower || titleLower.includes(d.title.toLowerCase())) &&
+        (d.artist.toLowerCase() === artistLower || artistLower.includes(d.artist.toLowerCase()))
+      );
+
+      if (officialMatch) {
+        const key = `${officialMatch.title.toLowerCase().trim()}_${officialMatch.artist.toLowerCase().trim()}`;
+        if (!seenTitles.has(key)) {
+          seenTitles.add(key);
+          list.push(officialMatch);
+        }
+        return;
+      }
+
+      const key = `${titleLower.trim()}_${artistLower.trim()}`;
       if (!seenTitles.has(key)) {
         seenTitles.add(key);
         list.push(t);
       }
     });
 
-    // 2. Complementar con catálogo demo verificado si coincide la búsqueda
-    const qLower = query.toLowerCase();
-    CONFIG.DEMO_CATALOG.forEach((demo) => {
-      if (demo.title.toLowerCase().includes(qLower) || demo.artist.toLowerCase().includes(qLower)) {
-        const key = `${demo.title.toLowerCase().trim()}_${demo.artist.toLowerCase().trim()}`;
+    // 3. Complementar con catálogo iTunes
+    itunesTracks.forEach((it) => {
+      const titleLower = it.title.toLowerCase();
+      const artistLower = it.artist.toLowerCase();
+
+      const officialMatch = CONFIG.DEMO_CATALOG.find((d) =>
+        (d.title.toLowerCase() === titleLower || titleLower.includes(d.title.toLowerCase())) &&
+        (d.artist.toLowerCase() === artistLower || artistLower.includes(d.artist.toLowerCase()))
+      );
+
+      if (officialMatch) {
+        const key = `${officialMatch.title.toLowerCase().trim()}_${officialMatch.artist.toLowerCase().trim()}`;
         if (!seenTitles.has(key)) {
           seenTitles.add(key);
-          list.unshift(demo); // Poner las canciones verificadas arriba
+          list.push(officialMatch);
         }
+        return;
       }
-    });
 
-    // 3. Añadir pistas de iTunes resolviendo su audio
-    itunesTracks.forEach((it) => {
-      const key = `${it.title.toLowerCase().trim()}_${it.artist.toLowerCase().trim()}`;
+      const key = `${titleLower.trim()}_${artistLower.trim()}`;
       if (!seenTitles.has(key)) {
         seenTitles.add(key);
-        // Si hay una canción demo que coincida, prestarle el audio completo 320kbps
-        const demoMatch = CONFIG.DEMO_CATALOG.find(d => 
-          d.artist.toLowerCase() === it.artist.toLowerCase() ||
-          d.title.toLowerCase() === it.title.toLowerCase()
-        );
-        if (demoMatch) {
-          it.audioUrl = demoMatch.audioUrl;
-          it.duration = demoMatch.duration;
-          it.durationFormatted = demoMatch.durationFormatted;
-        }
         list.push(it);
       }
     });
